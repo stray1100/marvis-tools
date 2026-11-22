@@ -66,7 +66,7 @@ body{
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
   font-size:15px;line-height:1.6;
-  padding:0 0 40px;
+  padding:0 0 calc(40px + env(safe-area-inset-bottom));
   -webkit-font-smoothing:antialiased;
 }
 .wrap{max-width:760px;margin:0 auto;padding:0 14px}
@@ -111,6 +111,8 @@ h1{font-size:22px;line-height:1.3;margin:0 0 4px;letter-spacing:.5px}
 .btn.ghost{background:transparent}
 .btn.big{width:100%;min-height:52px;font-size:17px;font-weight:600;letter-spacing:1px}
 .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;transform:none;filter:grayscale(.2)}
+.btn:disabled.primary{background:var(--line);border-color:var(--line);color:var(--muted)}
 #cameraWrap{margin-top:12px;border-radius:12px;overflow:hidden;background:#000}
 #video{width:100%;max-height:52vh;display:block;object-fit:cover}
 #photoWrap{margin-top:12px;position:relative}
@@ -220,11 +222,26 @@ tbody tr:nth-child(even){background:var(--card2)}
 .source p{margin:4px 0;font-size:12.5px;color:var(--muted);word-break:break-all}
 .tag-a{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;background:var(--ok);color:#fff;margin-left:6px}
 .toast{
-  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;
+  position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;
   padding:10px 18px;border-radius:10px;font-size:13.5px;z-index:99;opacity:0;pointer-events:none;transition:.25s;
   max-width:88vw;text-align:center;
 }
 .toast.show{opacity:1}
+/* ---- 底部操作条：可撤销的清空（v1.2.3） ---- */
+.snackbar{
+  position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,16px);
+  display:flex;align-items:center;gap:10px;max-width:92vw;z-index:120;
+  background:rgba(28,28,30,.95);color:#fff;padding:9px 10px 9px 16px;border-radius:12px;
+  font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.22s;
+}
+.snackbar.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.snackbar .sb-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snackbar .sb-act{
+  flex:0 0 auto;min-height:38px;padding:0 14px;border-radius:9px;border:1px solid rgba(255,255,255,.3);
+  background:transparent;color:#fff;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;
+}
+.snackbar .sb-act:active{background:rgba(255,255,255,.16)}
+.caliber{font-size:12px;color:var(--muted);margin:6px 0 0;text-align:center}
 [hidden]{display:none !important}
 @media (min-width:560px){
   body{font-size:16px}
@@ -329,17 +346,51 @@ html[data-theme="dark"] .sp.p{color:#6aa9e0}
   border-radius:var(--radius) var(--radius) 0 0; }
 .kbar-l{ display:flex; gap:10px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); }
 .kbar-l span{ white-space:nowrap; }
-.mini-btn{ min-height:34px; padding:0 12px; border-radius:9px; border:1px solid var(--line);
+.mini-btn{ min-height:44px; padding:0 12px; border-radius:9px; border:1px solid var(--line);
   background:var(--card); color:var(--text); font-size:12.5px; font-family:inherit; cursor:pointer; }
 
+/* ---- 情形：右上角胶囊按钮 + 锚定弹层（v1.2.2） ---- */
+.kbar{ flex-wrap:wrap; row-gap:8px; }
+.kbar-l{ flex:1 1 auto; min-width:0; }
+.opt-btn{ display:inline-flex; align-items:center; gap:6px; flex:0 0 auto; max-width:58%;
+  transition:.15s; }
+.opt-btn .opt-k{ font-weight:600; white-space:nowrap; }
+.opt-btn .opt-v{ font-size:11.5px; color:var(--muted); max-width:118px; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap; }
+.opt-btn.on{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+.opt-btn.on .opt-v{ color:var(--accent); opacity:.85; }
+.opt-btn:active{ transform:scale(.97); }
+
+.opt-mask{ position:fixed; inset:0; background:rgba(0,0,0,.30); z-index:60;
+  opacity:0; transition:opacity .18s ease; }
+.opt-mask.show{ opacity:1; }
+.opt-pop{ position:fixed; right:14px; z-index:61;
+  width:min(360px, calc(100vw - 28px)); max-height:76vh; overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px;
+  box-shadow:0 18px 48px rgba(0,0,0,.28);
+  opacity:0; transform:translateY(-8px) scale(.97); transform-origin:top right;
+  transition:opacity .18s ease, transform .18s ease; }
+.opt-pop.show{ opacity:1; transform:none; }
+.opt-pop .pop-head{ display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin-bottom:10px; }
+.opt-pop .pop-head strong{ font-size:15px; }
+.opt-pop .pop-done{ min-height:34px; padding:0 16px; border-radius:9px; border:none;
+  background:var(--accent); color:#fff; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; }
+.opt-pop .opt-grid{ gap:8px; }
+.opt.on{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); font-weight:600; }
+@media (max-width:360px){
+  .opt-btn .opt-v{ max-width:76px; }
+}
+
 .modes{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; padding:12px 12px 0; }
-.modes button{ min-height:42px; border-radius:10px; border:1px solid var(--line);
+.modes button{ min-height:44px; border-radius:10px; border:1px solid var(--line);
   background:var(--card2); color:var(--text); font-size:13.5px; font-family:inherit;
   cursor:pointer; transition:.12s; }
 .modes button.active{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
 
 .suit-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px 12px 0; }
-.suit-row button{ min-height:40px; border-radius:10px; border:1px solid var(--line);
+.suit-row button{ min-height:44px; border-radius:10px; border:1px solid var(--line);
   background:var(--card); color:var(--text); font-size:15px; font-weight:600;
   font-family:inherit; cursor:pointer; }
 .suit-row button.active{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
@@ -397,7 +448,7 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
 .flow-item .btn-row{ padding:0 11px 10px; margin-top:0 !important; }
 
 @media (max-width:380px){
-  .modes button{ font-size:12.5px; min-height:38px; }
+  .modes button{ font-size:12.5px; min-height:44px; }
   .key{ min-height:50px; }
   .key b{ font-size:18px; }
 }
@@ -441,7 +492,11 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
           <span id="kMeld">副露 0</span>
           <span id="kWin">和牌 —</span>
         </div>
-        <button class="mini-btn" id="btnOpt" type="button">情形</button>
+        <button class="mini-btn opt-btn" id="btnOpt" type="button"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="optPop"
+                aria-label="和牌情形设置">
+          <span class="opt-k">情形</span><span class="opt-v" id="optSum">未设</span>
+        </button>
       </div>
 
       <div class="modes" id="modeBar">
@@ -485,9 +540,13 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
       </div>
     </section>
 
-    <!-- 和牌情形（可折叠） -->
-    <section class="card" id="optCard" hidden>
-      <h2><span class="step">2</span>和牌情形</h2>
+    <!-- 和牌情形：收进右上角「情形」按钮，点开即弹层（v1.2.2） -->
+    <div class="opt-mask" id="optMask" hidden></div>
+    <section class="opt-pop" id="optPop" role="dialog" aria-modal="true" aria-labelledby="optPopTitle" hidden>
+      <div class="pop-head">
+        <strong id="optPopTitle">和牌情形</strong>
+        <button class="pop-done" id="optDone" type="button">完成</button>
+      </div>
       <div class="opt-grid">
         <label class="opt"><input type="checkbox" id="fSelf">自摸</label>
         <label class="opt"><input type="checkbox" id="fGsh">杠上花</label>
@@ -516,7 +575,7 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
           </select>
         </label>
       </div>
-      <p class="hint">杠计根：明杠 / 暗杠的 4 张各计 1 根。若你打的口径是「杠不算根」，把它取消勾选即可。</p>
+      <p class="hint">杠计根：明杠 / 暗杠的 4 张各计 1 根。若你打的口径是「杠不算根」，把它取消勾选即可。点空白处或「完成」收起。</p>
     </section>
 
     <!-- 拍照底图（可折叠，仅作对照） -->
@@ -541,6 +600,7 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
     <section class="card">
       <button class="btn primary big" id="btnCalc" type="button">算 番</button>
       <p class="hint" id="quickTip">手牌录满 13 张后，下一张点数字会自动记为和牌张。</p>
+      <p class="caliber" id="caliberTip"></p>
     </section>
 
     <!-- 结果 -->
@@ -706,6 +766,10 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="snackbar" id="snackbar" role="status" aria-live="polite">
+  <span class="sb-text" id="sbText"></span>
+  <button class="sb-act" id="sbAct" type="button">撤销</button>
+</div>
 
 <script>
 /* ============ 基础数据 ============ */
@@ -1014,6 +1078,28 @@ function toast(msg){
   toast._t = setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
+/* 底部操作条：带「撤销」动作，4 秒后自动收起 */
+function hideSnackbar(){
+  var sb = $('snackbar');
+  if (!sb) return;
+  clearTimeout(hideSnackbar._t);
+  sb.classList.remove('show');
+  SB_ACTION = null;
+}
+var SB_ACTION = null;
+function showSnackbar(text, actText, action){
+  var sb = $('snackbar');
+  if (!sb) return;
+  $('sbText').textContent = text;
+  var act = $('sbAct');
+  act.textContent = actText || '撤销';
+  act.hidden = !action;
+  SB_ACTION = action || null;
+  sb.classList.add('show');
+  clearTimeout(hideSnackbar._t);
+  hideSnackbar._t = setTimeout(function(){ hideSnackbar(); }, 4000);
+}
+
 /* ================= 录入交互（数字键盘 · 单屏） ================= */
 var LS_KEY = 'cm_state_v2';
 var KEYPAD = { suit:'m' };
@@ -1029,6 +1115,44 @@ function handTarget(){
   // 杠的第 4 张是补牌，不占手牌额度，故不额外扣减。
   var ms = S.melds || [];
   return Math.max(0, 13 - ms.length * 3);
+}
+function calcGateInfo(){
+  var ms = S.melds || [];
+  var kongCount = ms.filter(function(m){ return m.type === 'kong' || m.type === 'ankong'; }).length;
+  var total = S.hand.length + (S.win ? 1 : 0) + meldCards();
+  var expect = 14 + kongCount;
+  return {
+    total: total, expect: expect, diff: expect - total,
+    hasWin: !!S.win, kongCount: kongCount, kongNote: kongCount
+  };
+}
+/* 算番前置约束：牌数未齐时禁用按钮并说明还差几张，避免点了才报错 */
+function updateCalcGate(){
+  var btn = $('btnCalc'), tip = $('quickTip'), cal = $('caliberTip');
+  if (!btn) return;
+  var g = calcGateInfo();
+  if (!g.hasWin){
+    btn.disabled = true;
+    btn.textContent = '算 番（先选和牌张）';
+    tip.textContent = '还差和牌张：手牌录到 ' + handTarget() + ' 张后，下一张会自动记为和牌张；也可切到「和牌」模式手动点。';
+  } else if (g.diff > 0){
+    btn.disabled = true;
+    btn.textContent = '算 番（还差 ' + g.diff + ' 张）';
+    tip.textContent = '还差 ' + g.diff + ' 张：一副和牌共 ' + g.expect + ' 张（14 张' + (g.kongCount ? ' + ' + g.kongCount + ' 个杠各补 1 张' : '') + '）。';
+  } else if (g.diff < 0){
+    btn.disabled = true;
+    btn.textContent = '算 番（多了 ' + (-g.diff) + ' 张）';
+    tip.textContent = '多了 ' + (-g.diff) + ' 张：应为 ' + g.expect + ' 张，请删掉多余的牌。';
+  } else {
+    btn.disabled = false;
+    btn.textContent = '算 番';
+    tip.textContent = '牌数已齐（' + g.total + ' 张），点上面按钮出番型与得分。';
+  }
+  if (cal){
+    var capTxt = S.cap ? '封顶 ' + S.cap + ' 番' : '不封顶';
+    cal.textContent = '当前口径：' + capTxt + ' · 底分 ' + S.baseScore + ' · 未胡 ' + S.leftPlayers + ' 人'
+      + (S.flags.gangRoot ? ' · 杠计根' : ' · 杠不计根');
+  }
 }
 function cmpTile(a, b){
   if (SUIT_ORDER[a.charAt(0)] !== SUIT_ORDER[b.charAt(0)]) return SUIT_ORDER[a.charAt(0)] - SUIT_ORDER[b.charAt(0)];
@@ -1172,7 +1296,7 @@ function render(){
     b.classList.toggle('active', b.getAttribute('data-mode') === S.editing);
   });
 
-  // 情形摘要
+  // 情形摘要（收进右上角「情形」胶囊：短标签 + 省略号，详情在弹层内）
   var f = S.flags;
   var bits = [];
   if (f.selfDraw) bits.push('自摸');
@@ -1180,11 +1304,18 @@ function render(){
   if (f.gangShangPao) bits.push('杠上炮');
   if (f.tianhe) bits.push('天和');
   if (f.dihe) bits.push('地和');
-  bits.push('封顶' + (S.cap ? S.cap + '番' : '无'));
-  $('btnOpt').textContent = '情形：' + bits.join('·');
+  var capTxt = (S.cap === 4) ? '' : (S.cap ? '封顶' + S.cap : '不封顶');
+  var sumTxt = bits.join('·');
+  if (capTxt) sumTxt = sumTxt ? (sumTxt + '·' + capTxt) : capTxt;
+  $('optSum').textContent = sumTxt || '未设';
+  $('btnOpt').classList.toggle('on', bits.length > 0 || !!capTxt);
+  syncOptLabels();
 
   // 拍照底图状态
   $('photoCard').hidden = !PHOTO_SHOWN;
+
+  // 算番前置约束与口径提示
+  updateCalcGate();
 }
 
 /* ---- 删除交互 ---- */
@@ -1223,21 +1354,67 @@ $('suitRow').addEventListener('click', function(e){
 });
 
 /* ---- 撤销 / 清空 / 情形 / 照片 ---- */
+$('sbAct').addEventListener('click', function(){
+  var fn = SB_ACTION;
+  hideSnackbar();
+  if (fn) fn();
+});
+
 $('btnUndo').addEventListener('click', function(){
   if (!popUndo()){ toast('没有可撤销的操作'); return; }
   render(); saveState();
 });
 
 $('btnClear').addEventListener('click', function(){
+  if (!S.hand.length && !S.melds.length && !S.win){ toast('本局还是空的，无需清空'); return; }
+  hideSnackbar();
   pushUndo();
   S.hand = []; S.melds = []; S.win = null;
   render(); saveState();
   $('resultCard').hidden = true;
-  toast('已清空，可点「撤销」找回');
+  showSnackbar('已清空本局录入', '撤销', function(){
+    if (!popUndo()){ toast('没有可撤销的操作'); return; }
+    render(); saveState();
+    toast('已还原清空前的录入');
+  });
 });
 
+/* ---- 情形弹层：右上角锚定，iOS 式轻量 popover ---- */
+function syncOptLabels(){
+  Array.prototype.forEach.call(document.querySelectorAll('#optPop .opt'), function(lab){
+    var inp = lab.querySelector('input');
+    if (inp) lab.classList.toggle('on', !!inp.checked);
+  });
+}
+function optPopOpen(){
+  var pop = $('optPop'), mask = $('optMask'), btn = $('btnOpt');
+  pop.hidden = false; mask.hidden = false;
+  var r = btn.getBoundingClientRect();
+  var top = r.bottom + 8;
+  var h = pop.offsetHeight;
+  if (top + h > window.innerHeight - 12) top = Math.max(8, window.innerHeight - h - 12);
+  pop.style.top = Math.round(top) + 'px';
+  btn.setAttribute('aria-expanded', 'true');
+  pop.classList.add('show'); mask.classList.add('show');
+  syncOptLabels();
+}
+function optPopClose(){
+  var pop = $('optPop'), mask = $('optMask'), btn = $('btnOpt');
+  if (!pop || pop.hidden) return;
+  pop.classList.remove('show'); mask.classList.remove('show');
+  btn.setAttribute('aria-expanded', 'false');
+  setTimeout(function(){ pop.hidden = true; mask.hidden = true; }, 190);
+}
 $('btnOpt').addEventListener('click', function(){
-  $('optCard').hidden = !$('optCard').hidden;
+  if ($('optPop').hidden) optPopOpen(); else optPopClose();
+});
+$('optMask').addEventListener('click', optPopClose);
+$('optDone').addEventListener('click', optPopClose);
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && !$('optPop').hidden) optPopClose();
+});
+window.addEventListener('resize', function(){
+  if (!$('optPop').hidden) optPopOpen();
 });
 
 $('btnPhoto').addEventListener('click', function(){
@@ -1406,6 +1583,7 @@ $('btnFlowCopy').addEventListener('click', function(){
 
 /* ---- 主算番页 / 开局页 / 规则页切换 ---- */
 function switchTab(which){
+  if (typeof optPopClose === 'function') optPopClose();
   var map = { calc:'tabCalc', open:'tabOpen', rule:'tabRule' };
   Object.keys(map).forEach(function(k){
     var pane = $(map[k]);
@@ -1528,6 +1706,16 @@ function breakdownText(state, r){
   return parts.join(' · ');
 }
 
+var RECORDED_SIG = null;
+function resultSig(state, r){
+  return JSON.stringify({
+    h: state.hand.slice().sort(),
+    m: state.melds.map(function(m){ return m.type + m.key; }),
+    w: state.win, f: state.flags, c: state.cap,
+    b: state.baseScore, l: state.leftPlayers, x: r.multiplier
+  });
+}
+
 function renderResult(state, r){
   var card = $('resultCard');
   var body = $('resultBody');
@@ -1624,7 +1812,11 @@ function renderResult(state, r){
     copyText(text, '已复制结果');
   });
 
-  $('btnToFlow').addEventListener('click', function(){
+  var btnToFlow = $('btnToFlow');
+  btnToFlow.addEventListener('click', function(){
+    if (btnToFlow.disabled) return;
+    var sig = resultSig(state, r);
+    if (RECORDED_SIG === sig && !window.confirm('同一牌型与口径刚刚已经记入过一局。确定再记一局吗？')) return;
     var role = $('roleSel').value;
     var unit = r.multiplier * state.baseScore;
     var score = 0;
@@ -1632,6 +1824,7 @@ function renderResult(state, r){
     else if (role === 'lose') score = -unit;
     var maxNo = 0;
     FLOW.forEach(function(x){ if (x.no > maxNo) maxNo = x.no; });
+    var thisNo = maxNo + 1;
     FLOW.push({
       id: 'f' + Date.now() + Math.floor(Math.random() * 1000),
       no: maxNo + 1,
@@ -1651,7 +1844,10 @@ function renderResult(state, r){
       time: new Date().toLocaleString('zh-CN', { hour12:false })
     });
     flowSave(); renderFlow();
-    toast('第 ' + (FLOW[FLOW.length - 1].no) + ' 局已记入流水（' + (score > 0 ? '+' + score : score) + ' 分）');
+    RECORDED_SIG = sig;
+    btnToFlow.disabled = true;
+    btnToFlow.textContent = '已记入第 ' + thisNo + ' 局';
+    toast('第 ' + thisNo + ' 局已记入流水（' + (score > 0 ? '+' + score : score) + ' 分）');
   });
 }
 
@@ -1665,6 +1861,7 @@ function copyText(text, okMsg){
 
 /* ---- 算番按钮 ---- */
 $('btnCalc').addEventListener('click', function(){
+  if (this.disabled) return;
   var state = {
     hand: S.hand.slice(),
     melds: S.melds.map(function(m){ return { type:m.type, key:m.key }; }),
@@ -1956,7 +2153,7 @@ renderSwap();
   });
 })();
 </script>
-<div class="verbar">v1.2.1 · 杠计根修复 · 数字键盘录入 · 多局流水与复盘</div>
+<div class="verbar">v1.2.3 · 清空可撤销 · 算番前置校牌 · 记入流水防重复 · 44px 触控与安全区</div>
 <script>
 /* zoom-guard-js: 双击缩放兜底 */
 (function(){
