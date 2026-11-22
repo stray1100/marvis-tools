@@ -1,7 +1,7 @@
 /* 川麻血战到底·拍照算番 —— Service Worker（完全离线）
  * 升级：改动页面后把 CACHE_VERSION 递增，重新部署，用户下次联网打开即自动换新版本。
  */
-var CACHE_VERSION = 'cm-pwa-v1.2.3';
+var CACHE_VERSION = 'cm-pwa-v1.2.4';
 var CACHE_NAME = CACHE_VERSION;
 
 var PRECACHE_URLS = [

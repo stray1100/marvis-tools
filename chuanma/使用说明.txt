@@ -1,14 +1,16 @@
-川麻血战到底 · 算番助手（完全离线 PWA） v1.2.3
+川麻血战到底 · 算番助手（完全离线 PWA） v1.2.4
 ======================================================
 
 【在线地址】
-https://jocular-wisp-31bb1e.netlify.app/
+https://stray1100.github.io/marvis-tools/chuanma/index.html
 
 【安装到手机主屏幕】
 1. 用 Safari（iPhone）或 Chrome（安卓）打开上面的地址；
 2. 停留 5~10 秒，让页面完成离线缓存；
 3. 点底部「分享」→「添加到主屏幕」→ 添加；
 4. 从主屏幕「川」图标启动，全屏、可断网使用。
+
+【v1.2.4 改版】情形弹层窄屏免右滑：封顶 / 底分 / 未胡人数三项在窄屏（≤430px）改为两列排布，「未胡人数」独占整行，弹层禁止横向滚动；控件宽度改为可收缩（minmax(0,1fr) + min-width:0），封顶选项文案收紧为「4番·8倍 / 5番·16倍 / 6番·32倍」，320px 极小屏也能一次看全。
 
 【v1.2.3 改版】按上一轮优化建议落地：
 · 清空可撤销：点「清空」不再直接清空，底部出现撤销条，5 秒内点「撤销」即完整还原刚才的手牌与选项；已空时点清空不再弹提示。
@@ -58,7 +60,7 @@ https://jocular-wisp-31bb1e.netlify.app/
 【离线原理与更新】
 · index.html（内嵌样式与脚本）+ manifest.json（全屏 standalone）+ sw.js（预缓存资源）
   → 首次联网打开即完成缓存，此后断网可用；
-· 更新方式：修改页面后必须把 sw.js 的 CACHE_VERSION 递增（当前 cm-pwa-v1.2.3），
+· 更新方式：修改页面后必须把 sw.js 的 CACHE_VERSION 递增（当前 cm-pwa-v1.2.4），
   再重新部署；
 · iPhone 上联网打开一次即拉取新版本；若内容或图标没刷新：删除主屏幕图标 →
   Safari 打开一次 → 重新添加到主屏幕。
@@ -66,7 +68,7 @@ https://jocular-wisp-31bb1e.netlify.app/
 【包内文件】
 · index.html（自包含，样式与逻辑全内嵌）
 · manifest.json（standalone、主题色 #b03a2e）
-· sw.js（导航请求缓存优先 + 后台拉新，CACHE_VERSION = cm-pwa-v1.2.3）
+· sw.js（导航请求缓存优先 + 后台拉新，CACHE_VERSION = cm-pwa-v1.2.4）
 · icons/apple-touch-icon-180.png（墨绿毡布底 + 象牙牌身红釉宋体「川」）
 · icons/icon-192.png、icons/icon-512.png（安卓 / 桌面图标）
 · icons/icon-maskable-512.png（自适应 maskable 图标）

@@ -182,11 +182,14 @@ html[data-theme="dark"] .pick.p b{color:#6aa9e0}
   border:1px solid var(--line);background:var(--card2);font-size:14px;cursor:pointer;
 }
 .opt input{width:18px;height:18px;accent-color:var(--accent);margin:0}
-.sel-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+/* v1.2.4：列宽改为 minmax(0,1fr) + 控件 min-width:0，杜绝横向溢出需右滑 */
+.sel-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);min-width:0}
 .field select,.field input{
+  width:100%;min-width:0;max-width:100%;box-sizing:border-box;
   min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);
   color:var(--text);font-family:inherit;font-size:16px;padding:0 8px;
+  text-overflow:ellipsis;
 }
 .result-hero{
   background:linear-gradient(135deg,var(--accent),#8e2d24);
@@ -365,7 +368,7 @@ html[data-theme="dark"] .sp.p{color:#6aa9e0}
   opacity:0; transition:opacity .18s ease; }
 .opt-mask.show{ opacity:1; }
 .opt-pop{ position:fixed; right:14px; z-index:61;
-  width:min(360px, calc(100vw - 28px)); max-height:76vh; overflow:auto;
+  width:min(360px, calc(100vw - 28px)); max-height:76vh; overflow-y:auto; overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px;
   box-shadow:0 18px 48px rgba(0,0,0,.28);
@@ -378,6 +381,12 @@ html[data-theme="dark"] .sp.p{color:#6aa9e0}
 .opt-pop .pop-done{ min-height:34px; padding:0 16px; border-radius:9px; border:none;
   background:var(--accent); color:#fff; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; }
 .opt-pop .opt-grid{ gap:8px; }
+/* v1.2.4：窄屏三列放不下时改两列，「未胡人数」独占整行，取消横向滚动 */
+@media (max-width:430px){
+  .opt-pop .opt-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .sel-row{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .sel-row .field:last-child{ grid-column:1 / -1; }
+}
 .opt.on{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); font-weight:600; }
 @media (max-width:360px){
   .opt-btn .opt-v{ max-width:76px; }
@@ -558,9 +567,9 @@ html[data-theme="dark"] .key.p b{ color:#7aa9e8; }
       <div class="sel-row">
         <label class="field">封顶
           <select id="capSel">
-            <option value="4">4 番（8 倍）</option>
-            <option value="5">5 番（16 倍）</option>
-            <option value="6">6 番（32 倍）</option>
+            <option value="4">4番·8倍</option>
+            <option value="5">5番·16倍</option>
+            <option value="6">6番·32倍</option>
             <option value="0">不封顶</option>
           </select>
         </label>
@@ -2153,7 +2162,7 @@ renderSwap();
   });
 })();
 </script>
-<div class="verbar">v1.2.3 · 清空可撤销 · 算番前置校牌 · 记入流水防重复 · 44px 触控与安全区</div>
+<div class="verbar">v1.2.4 · 情形浮层窄屏免右滑 · 清空可撤销 · 算番前置校牌 · 记入流水防重复 · 44px 触控与安全区</div>
 <script>
 /* zoom-guard-js: 双击缩放兜底 */
 (function(){
